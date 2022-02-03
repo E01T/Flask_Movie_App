@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+<!--  -->
+{% block title %} ERROR 500: Internal Server Error {% endblock title %}
+<!--  -->
+{% block content %}
+<!--  -->
+<div class="error_message">
+  ERROR 500: Υπάρχει πρόβλημα με το Server. Παρακαλώ δοκιμαστε ξανά αργότερα.
+</div>
+
+<div class="error_image_container">
+  <!-- Προσθέστε παρακάτω το μονοπάτι για μία κανονική εικόνα μέσα στα static files στο src του παρακάτω img tag -->
+  <img
+    class="error_image"
+    width="1280"
+    src="{{ url_for('static', filename='images/errors/500.png') }}"
+    alt="internal server error"
+  />
+</div>
+{% endblock content %}

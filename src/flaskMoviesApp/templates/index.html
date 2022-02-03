@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+<!--  -->
+{% block title %} Index {% endblock title %}
+<!--  -->
+{% block content %}
+
+<h2 class="aba_header">Ταινίες απ'όλους τους χρήστες</h2>
+<hr />
+
+<!-- Τα παρακάτω δύο κουμπιά θα πρέπει να ταξινομούν τη λίστα ανά βαθμολογία ή έτος πρώτης προβολής αντίστοιχα -->
+
+<div class="align-buttons">
+  <a
+    class="btn btn-primary btn-sm mt-1 mb-1"
+    href="{{ url_for('root', ordering_by='rating') }}"
+    >Ταξινόμηση βάσει βαθμολογίας</a
+  >
+  &nbsp;&nbsp;&nbsp;
+  <a
+    class="btn btn-primary btn-sm mt-1 mb-1"
+    href="{{ url_for('root', ordering_by='release_year') }}"
+    >Ταξινόμηση βάσει έτους προβολής</a
+  >
+</div>
+<hr />
+
+{% if movies %}
+
+<!-- Εδώ πρέπει να μπεί ο κώδικας που εμφανίζει τη λίστα με τις ταινίες -->
+{% for movie in movies.items %}
+<div class="row my-3 p-3 bg-body rounded shadow-sm">
+  <div class="col col-md-12">
+    {% if movie.image and movie.image != 'default_movie_image.png' %}
+    <img
+      src="{{ url_for('static', filename='images/movies_images/' + movie.image) }}"
+      alt=""
+      class="img-responsive a_image"
+      height="480px"
+    />
+    {% endif %}
+  </div>
+  <div class="col col-md-12">
+    <div class="main-movie-title">
+      <a class="movie_title" href="{{ url_for('movie', movie_id=movie.id) }}"
+        >{{ movie.title | safe }} ({{ movie.release_year}}) [{{ movie.rating / 10 }}]</a
+      >
+    </div>
+    <small class="movie_date">[{{ movie.date_created.strftime('%d-%m-%Y') }}]</small>
+    <p class="main-movie-partial-text">{{ movie.plot | truncate(255) | safe }}</p>
+    <p class="">
+      Από
+      <span>
+        <a
+          class="author-name"
+          href="{{ url_for('movies_by_author', author_id=movie.author.id) }}"
+        >
+          {{ movie.author.username }}
+          <img
+            class="rounded-circle profile-image"
+            alt="{{ movie.author.username }}"
+            src="{{ url_for('static', filename='images/profiles_images/' + movie.author.profile_image) }}"
+            data-holder-rendered="true"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="{{ movie.author.username }}"
+          />
+        </a>
+      </span>
+    </p>
+  </div>
+  <!-- Αρχικά θα είναι η εικόνα, από κάτω ο τίτλος και δίπλα από τον τίτλο το έτος πρώτης προβολής και το rating -->
+  <!-- Στην εικόνα καθορίστε το "height=480px" χωρίς να βάλετε width ώστε να μην παραμορφώνεται -->
+  <!-- κάτω από τον τίτλο θα είναι η πλοκή/υπόθεση της ταινίας κομμένη στους 255 χαρακτήρες -->
+  <!-- τέλος, κάτω από την πλοκή θα είναι ο χρήστης που εισήγαγε την ταινία με το εικονίδιό του -->
+  <!-- Πατώντας στον τίτλο της ταινίας θα μας πηγαίνει στη σελίδα όπου μπορούμε να δούμε το πλήρες κείμενο της πλοκής -->
+  <!-- κι επίσης θα μπορούμε να κάνουμε αλλαγή/διαγραφή (εφόσον είμαστε ο χρήστης που εισήγαγε την ταινία) -->
+  <!-- Πατώντας στη όνομα του χρήστη ή στο εικονίδιό του θα μας πηγαίνει στη λίστα με τις ταινίες του συγκεκριμένου χρήστη -->
+  <!-- Η λίστα των ταινιών θα πρέπει από default να είναι ταξινομημένες ανά φθίνουσα ημερομηνία εισαγωγής τους -->
+</div>
+<hr />
+{% endfor %}
+
+<div>
+  <!-- Εδώ θα πρέπει να μπεί ο κώδικας για το pagination της σελίδας -->
+  {% for page_number in movies.iter_pages(left_edge=3, right_edge=3, left_current=1,
+  right_current=2) %}
+  <!--  -->
+  {% if page_number %}
+  <!--  -->
+  {% if page_number == movies.page %}
+  <a
+    class="btn btn-primary"
+    href="{{ url_for('root', page=page_number, ordering_by=ordering_by if ordering_by else None) }}"
+  >
+    {{ page_number }}
+  </a>
+  {% else %}
+  <a
+    class="btn btn-outline-primary"
+    href="{{ url_for('root', page=page_number, ordering_by=ordering_by if ordering_by else None) }}"
+  >
+    {{ page_number }}
+  </a>
+  {% endif %}
+  <!--  -->
+  {% else %}
+  <span>...</span>
+  <!--  -->
+  {% endif %}
+  <!--  -->
+  {% endfor %}
+  <!--  -->
+</div>
+
+{% else %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+  Δε βρέθηκε καμμία ταινία
+</div>
+{% endif %}
+<!--  -->
+{% endblock %}

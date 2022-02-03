@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+<!--  -->
+{% block title %} Error 404: Page Not Found {% endblock title %}
+<!--  -->
+{% block content %}
+
+<div class="error_message">ERROR 404! Η σελίδα που ζητήσατε δε βρέθηκε!</div>
+
+<div class="error_image_container">
+  <!-- Προσθέστε παρακάτω το μονοπάτι για μία κανονική εικόνα μέσα στα static files στο src του παρακάτω img tag -->
+  <img
+    class="error_image"
+    width="1280"
+    src="{{ url_for('static', filename='images/errors/404.png') }}"
+    alt="page not found"
+  />
+</div>
+{% endblock content %}
+
+<!-- παρομοίως με αυτό το template θα πρέπει να φτιαχτούν και τα αντίστοιχα templates για τα errors 415 και 500 -->

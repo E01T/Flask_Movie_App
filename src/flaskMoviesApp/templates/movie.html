@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+<!--  -->
+{% block title %} {{ movie.title }} {% endblock title %}
+<!--  -->
+{% block content %}
+
+<main role="main" class="container">
+  {% if movie %}
+  <div class="row my-3 p-3 bg-body rounded shadow-sm">
+    <div class="col col-md-12">
+      {% if movie.image and movie.image != 'default_movie_image.png' %}
+      <img
+        src="{{ url_for('static', filename='images/movies_images/'+movie.image) }}"
+        alt="{{ movie.title }}"
+        title="{{ movie.title }}"
+        class="img-responsive mx-auto d-block a_image"
+      />
+      {% endif %}
+    </div>
+    <div class="col col-md-12">
+      <p class="main-movie-title">
+        {{ movie.title }} ({{ movie.release_year }}) [{{ movie.rating / 10 }}]
+      </p>
+      <small class="movie_date">[{{ movie.date_created.strftime('%d-%m-%Y')}}]</small>
+
+      <div>
+        <!-- Εδώ θα πρέπει να γίνεται έλεγχος αν ο χρήστης που βλέπει αυτή τη σελίδα της ταινίας -->
+        <!-- έχει το δικαίωμα να διαγράψει ή να αλλάξει τα στοιχεία της ταινίας αυτής και να εμφανίζει  -->
+        <!-- ή όχι τα αντίστοιχα κουμπιά αλλαγής/διαγραφής. Το κουμπί διαγραφής θα πρέπει να καλεί -->
+        <!-- το Modal στην κάτω μεριά του κώδικα. -->
+        {% if movie.author == current_user %}
+        <a
+          class="btn btn-primary btn-sm mt-1 mb-1"
+          href="{{ url_for('edit_movie', movie_id=movie.id) }}"
+          >Αλλαγή</a
+        >
+        <button
+          type="button"
+          class="btn btn-danger btn-sm m-1"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteModal"
+        >
+          Διαγραφή
+        </button>
+        {% endif %}
+      </div>
+
+      <div class="main-movie-full-text">{{ movie.plot | safe }}</div>
+
+      <p class="">
+        By
+        <span>
+          <a
+            class="author-name"
+            href="{{ url_for('movies_by_author', author_id=movie.author.id) }}"
+          >
+            {{ movie.author.username }}
+            <img
+              class="rounded-circle navbar-profile-image"
+              alt="{{ current_user.username }}"
+              src="{{ url_for('static', filename='images/profiles_images/'+movie.author.profile_image) }}"
+              data-holder-rendered="true"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title="{{ movie.author.username }}"
+            />
+          </a>
+        </span>
+      </p>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-info alert-dismissible fade show" role="alert">
+    Δε βρέθηκε καμμία ταινία
+  </div>
+  {% endif %}
+</main>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Διαγραφή ταινίας</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Είστε σίγουρος/η ότι θέλετε να διαγράψετε αυτήν την ταινία;
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Όχι
+        </button>
+        <form action="{{ url_for('delete_movie', movie_id=movie.id) }}" method="POST">
+          <input type="submit" class="btn btn-danger" value="Διαγραφή Ταινίας" />
+        </form>
+        <!-- Εδώ πρέπει να μπεί η φόρμα που περιέχει το κουμπί διαγραφής της ταινίας -->
+        <!-- και οδηγεί στο route διαγραφής -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
