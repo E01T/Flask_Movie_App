@@ -1,7 +1,9 @@
+from unicodedata import name
 from flask import render_template, redirect, url_for, request, flash, abort
 from flaskMoviesApp.forms import SignupForm, LoginForm, NewMovieForm, AccountUpdateForm
-from flaskMoviesApp.models import User, Movie
+from flaskMoviesApp.models import User, Movie, Actor
 from flask_login import login_user, current_user, logout_user, login_required
+from sqlalchemy import inspect
 
 from werkzeug.utils import secure_filename
 
@@ -247,10 +249,12 @@ def new_movie():
             release_year=form.release_year.data,
             user_id=current_user.id
         )
-
+        for actor in form.actors.data:
+            print(actor)
+            # The append method expects a Actor instance
+            movie.actors.append(Actor(name=actor))
         db.session.add(movie)
         db.session.commit()
-
         flash(
             f'Η ταινία: <b>{movie.title}</b> καταχωρήθηκε με επιτυχία.', 'success')
 
@@ -322,10 +326,13 @@ def edit_movie(movie_id):
 
     # Έλεγχος αν βρέθηκε η ταινία
     if movie:
+
         # αν ναι, αρχικοποίηση της φόρμας ώστε τα πεδία να είναι προσυμπληρωμένα
+        # turn sqlalchemy.orm.collections.InstrumentedList into list of strings
+        xs = [str(actor) for actor in movie.actors]
+
         form = NewMovieForm(title=movie.title,
-                            plot=movie.plot, release_year=movie.release_year, rating=movie.rating)
-        print(movie.image)
+                            plot=movie.plot, actors=xs, release_year=movie.release_year, rating=movie.rating)
 
         # έλεγχος των πεδίων (validation) και αλλαγή (ή προσθήκη εικόνας) στα στοιχεία της ταινίας
         if request.method == 'POST' and form.validate_on_submit():

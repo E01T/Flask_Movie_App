@@ -1,13 +1,30 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField
-from wtforms import StringField, SubmitField, BooleanField, TextAreaField, IntegerField
+from wtforms import StringField, SubmitField, BooleanField, TextAreaField, IntegerField, Field
 from wtforms.validators import DataRequired, Email, Length, EqualTo, NumberRange, ValidationError, Optional
+from wtforms.widgets import TextInput
 from flaskMoviesApp.models import User
 from flask_login import current_user
 
 from datetime import datetime as dt
 
 ### Συμπληρώστε κάποια από τα imports που έχουν αφαιρεθεί ###
+
+
+class TagListField(Field):
+    widget = TextInput()
+
+    def _value(self):
+        if self.data:
+            return ', '.join(self.data)
+        else:
+            return ''
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = [x.strip() for x in valuelist[0].split(',')]
+        else:
+            self.data = []
 
 
 current_year = dt.now().year
@@ -124,6 +141,10 @@ class NewMovieForm(FlaskForm):
                                                         FileAllowed(['jpg', 'jpeg', 'png'],
                                                                     'Επιτρέπονται μόνο αρχεία εικόνων τύπου jpg, jpeg και png!'),
                                                         maxImageSize(max_size=2)])
+
+    # added today
+    actors = TagListField(label="Ηθοποιοί", validators=[DataRequired(
+        message="Αυτό το πεδίο δε μπορεί να είναι κενό.")])
 
     # IntegerField με το έτος πρώτης προβολής της ταινίας, θα παίρνει τιμές από το 1888 έως το current_year που υπολογίζεται στην αρχή του κώδικα εδώ στο forms.py
     release_year = IntegerField(label="Έτος Πρώτης Προβολής Ταινίας", validators=[DataRequired(message="Αυτό το πεδίο δε μπορεί να είναι κενό."), NumberRange(

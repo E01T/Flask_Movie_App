@@ -8,6 +8,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+movies_actors = db.Table('movies_actors',
+                         db.Column('movie_id', db.Integer,
+                                   db.ForeignKey('movie.id')),
+                         db.Column('actor_id', db.Integer, db.ForeignKey('actor.id')))
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(15), unique=True, nullable=False)
@@ -19,6 +25,17 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"{self.username}:{self.email}"
+
+
+class Actor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    # backref is a pseudo-column that creates a new attribute on the Movie class/table
+    plays_to = db.relationship(
+        'Movie', secondary=movies_actors, backref='actors')
+
+    def __repr__(self):
+        return f"{self.name}"
 
 
 class Movie(db.Model):

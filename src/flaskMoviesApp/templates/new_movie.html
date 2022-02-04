@@ -43,6 +43,23 @@ content%}
         </div>
 
         <div class="mb-3">
+          {{ form.actors.label(class="form-label") }}
+          <!-- -->
+          {{ form.actors(class="form-control", required=False) }}
+          <div id="movie_actorsHelp" class="form-text">
+            Παρακαλώ δώστε τα ονόματα των ηθοποιών χωρισμένα με κόμμα. π.χ. Θανάσης
+            Βέγγος, Νίκος Ρίζος, Μάριος Καλλιέργης
+          </div>
+          {% if form.actors.errors %}
+          <ul class="errors">
+            {% for error in form.actors.errors %}
+            <li class="alert text-danger">{{ error }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
           {{ form.image.label(class="form-label") }}
           <!-- -->
           {{ form.image(class="form-control", required=False) }}
