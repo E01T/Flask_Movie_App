@@ -1,7 +1,7 @@
 from unicodedata import name
 from flask import render_template, redirect, url_for, request, flash, abort
 from flaskMoviesApp.forms import SignupForm, LoginForm, NewMovieForm, AccountUpdateForm
-from flaskMoviesApp.models import User, Movie, Actor
+from flaskMoviesApp.models import User, Movie, Actor, movies_actors
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy import inspect
 
@@ -251,8 +251,11 @@ def new_movie():
         )
         for actor in form.actors.data:
             print(actor)
-            # The append method expects a Actor instance
+            # actorExists = Actor.query.filter_by(name=actor).first()
+            # if not actorExists:
+            #     # The append method expects a Actor instance
             movie.actors.append(Actor(name=actor))
+
         db.session.add(movie)
         db.session.commit()
         flash(
@@ -277,6 +280,7 @@ def movie(movie_id):
     # Ανάκτηση της ταινίας με βάση το movie_id
     # ή εμφάνιση σελίδας 404 page not found
     movie = Movie.query.get_or_404(movie_id)
+    # actors = Actor.query.filter_by(movie_id=movie_id).all()
     return render_template("movie.html", movie=movie)
 
 
@@ -326,7 +330,6 @@ def edit_movie(movie_id):
 
     # Έλεγχος αν βρέθηκε η ταινία
     if movie:
-
         # αν ναι, αρχικοποίηση της φόρμας ώστε τα πεδία να είναι προσυμπληρωμένα
         # turn sqlalchemy.orm.collections.InstrumentedList into list of strings
         xs = [str(actor) for actor in movie.actors]
@@ -357,6 +360,15 @@ def edit_movie(movie_id):
                         os.remove(image_path)
 
                 movie.image = image_file
+
+            for actor in form.actors.data:
+                # existingActor = Actor.query.filter_by(name=actor).first()
+                # print(existingActor)
+                # if existingActor:
+                #     movie.actors.append(Actor(name=existingActor.name))
+                # else:
+                movie.actors.append(Actor(name=actor))
+                # The append method expects a Actor instance
 
             db.session.commit()
             flash(f'Η επεξεργασία της ταινίας έγινε με επιτυχία', 'success')

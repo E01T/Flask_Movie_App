@@ -47,6 +47,17 @@
 
       <div class="main-movie-full-text">{{ movie.plot | safe }}</div>
 
+      <div>
+        {% if movie.actors %}
+        <h3>Ηθοποιοί:</h2>
+        <ul>
+          {% for actor in movie.actors %}
+          <li>{{ actor.name }}</li>
+          {% endfor %}
+        </ul>
+        {% endif%}
+      </div>
+
       <p class="">
         By
         <span>

@@ -1,3 +1,4 @@
+from tkinter.tix import Tree
 from flaskMoviesApp import db, login_manager
 from datetime import datetime
 from flask_login import UserMixin
@@ -57,6 +58,8 @@ class Movie(db.Model):
         db.DateTime, nullable=False, default=datetime.utcnow)
     # δήλωση ID του χρήστη που αποθήκευσε την ταινία, ForeignKey στο πεδίο id του πίνακα user, υποχρεωτικό πεδίο
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    has_actors = db.relationship(
+        'Actor', secondary=movies_actors, backref='movie')
 
     def __repr__(self):
         return f"{self.date_created}:{self.title}:{self.rating}"
