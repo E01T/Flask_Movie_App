@@ -250,7 +250,7 @@ def new_movie():
             user_id=current_user.id
         )
         for actor in form.actors.data:
-            print(actor)
+            # print(actor)
             # actorExists = Actor.query.filter_by(name=actor).first()
             # if not actorExists:
             #     # The append method expects a Actor instance
